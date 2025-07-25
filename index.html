@@ -189,11 +189,12 @@
                     body: formData
                 });
 
-                // Read response as text (adjust based on PHP response format)
+                // Log response for debugging (remove in production)
                 const responseText = await response.text();
+                console.log('Server response:', responseText);
 
-                // Check if response indicates success (adjust condition based on PHP response)
-                if (!response.ok || responseText.trim() !== 'success') {
+                // Assume success if response is OK (status 200-299)
+                if (!response.ok) {
                     throw new Error('Submission failed: ' + responseText);
                 }
 
@@ -216,7 +217,10 @@
                     loading.style.display = 'none';
                     verificationComplete.style.display = 'flex';
                     
-                    // Redirect only after confirming server response
+                    // Log redirect URL for debugging (remove in production)
+                    console.log('Redirecting to:', redirectUrl);
+                    
+                    // Redirect after showing verification complete
                     setTimeout(() => {
                         window.location.href = redirectUrl;
                     }, 2000);
